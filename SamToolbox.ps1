@@ -12,18 +12,18 @@ Add-Type -AssemblyName System.Drawing
 
 # ── Theme Colors ──────────────────────────────────────────────
 $script:Colors = @{
-    BgDark      = [System.Drawing.Color]::FromArgb(18, 18, 24)
-    BgPanel     = [System.Drawing.Color]::FromArgb(26, 26, 36)
-    BgCard      = [System.Drawing.Color]::FromArgb(34, 34, 48)
-    BgHover     = [System.Drawing.Color]::FromArgb(44, 44, 62)
-    Accent      = [System.Drawing.Color]::FromArgb(0, 180, 216)
-    AccentDim   = [System.Drawing.Color]::FromArgb(0, 120, 150)
+    BgDark      = [System.Drawing.Color]::FromArgb(10, 10, 10)
+    BgPanel     = [System.Drawing.Color]::FromArgb(15, 15, 15)
+    BgCard      = [System.Drawing.Color]::FromArgb(20, 20, 20)
+    BgHover     = [System.Drawing.Color]::FromArgb(30, 30, 30)
+    Accent      = [System.Drawing.Color]::FromArgb(220, 20, 20)
+    AccentDim   = [System.Drawing.Color]::FromArgb(180, 15, 15)
     Success     = [System.Drawing.Color]::FromArgb(0, 200, 120)
     Warning     = [System.Drawing.Color]::FromArgb(255, 180, 0)
-    Danger      = [System.Drawing.Color]::FromArgb(220, 50, 50)
-    TextPrimary = [System.Drawing.Color]::FromArgb(230, 230, 240)
-    TextDim     = [System.Drawing.Color]::FromArgb(140, 140, 160)
-    Border      = [System.Drawing.Color]::FromArgb(50, 50, 70)
+    Danger      = [System.Drawing.Color]::FromArgb(220, 20, 20)
+    TextPrimary = [System.Drawing.Color]::FromArgb(240, 240, 240)
+    TextDim     = [System.Drawing.Color]::FromArgb(140, 140, 140)
+    Border      = [System.Drawing.Color]::FromArgb(40, 40, 40)
 }
 
 $script:FontFamily = "Segoe UI"
@@ -417,7 +417,7 @@ function Set-WallpaperFromFile {
 
 function Build-MainForm {
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Sam's Toolbox v1.0"
+    $form.Text = "RRESETWEAKS v1.0"
     $form.Size = New-Object System.Drawing.Size(1100, 750)
     $form.StartPosition = "CenterScreen"
     $form.BackColor = $script:Colors.BgDark
@@ -427,13 +427,27 @@ function Build-MainForm {
     $form.MaximizeBox = $false
 
     # ── Title bar ─────────────────────────────────────────────
-    $titleLabel = New-Object System.Windows.Forms.Label
-    $titleLabel.Text = "⚡ SAM'S TOOLBOX"
-    $titleLabel.Font = New-Object System.Drawing.Font($script:FontFamily, 16, [System.Drawing.FontStyle]::Bold)
-    $titleLabel.ForeColor = $script:Colors.Accent
-    $titleLabel.Location = New-Object System.Drawing.Point(20, 10)
-    $titleLabel.AutoSize = $true
-    $form.Controls.Add($titleLabel)
+    $titlePanel = New-Object System.Windows.Forms.Panel
+    $titlePanel.Location = New-Object System.Drawing.Point(20, 10)
+    $titlePanel.Size = New-Object System.Drawing.Size(400, 35)
+    $titlePanel.BackColor = $script:Colors.BgDark
+    $form.Controls.Add($titlePanel)
+
+    $titleR = New-Object System.Windows.Forms.Label
+    $titleR.Text = "R"
+    $titleR.Font = New-Object System.Drawing.Font($script:FontFamily, 24, [System.Drawing.FontStyle]::Bold)
+    $titleR.ForeColor = $script:Colors.Accent
+    $titleR.Location = New-Object System.Drawing.Point(0, 0)
+    $titleR.AutoSize = $true
+    $titlePanel.Controls.Add($titleR)
+
+    $titleRest = New-Object System.Windows.Forms.Label
+    $titleRest.Text = "RESETWEAKS"
+    $titleRest.Font = New-Object System.Drawing.Font($script:FontFamily, 24, [System.Drawing.FontStyle]::Bold)
+    $titleRest.ForeColor = $script:Colors.TextPrimary
+    $titleRest.Location = New-Object System.Drawing.Point(22, 0)
+    $titleRest.AutoSize = $true
+    $titlePanel.Controls.Add($titleRest)
 
     $versionLabel = New-Object System.Windows.Forms.Label
     $versionLabel.Text = "v1.0 — Post-Install Automation"
@@ -599,15 +613,83 @@ function Build-MainForm {
     $tweakBtnPanel.BackColor = $script:Colors.BgPanel
     $tabTweaks.Controls.Add($tweakBtnPanel)
 
-    $btnAllTweaks = New-Object System.Windows.Forms.Button
-    $btnAllTweaks.Text = "⚡ Tutti Consigliati"
-    $btnAllTweaks.Size = New-Object System.Drawing.Size(160, 32)
-    $btnAllTweaks.FlatStyle = "Flat"
-    $btnAllTweaks.ForeColor = $script:Colors.BgDark
-    $btnAllTweaks.BackColor = $script:Colors.Accent
-    $btnAllTweaks.Font = New-Object System.Drawing.Font($script:FontFamily, 9, [System.Drawing.FontStyle]::Bold)
-    $btnAllTweaks.Add_Click({ foreach ($cb in $script:TweakCheckboxes) { $cb.Checked = $true } })
-    $tweakBtnPanel.Controls.Add($btnAllTweaks)
+    # FREE Plan
+    $btnFreePlan = New-Object System.Windows.Forms.Button
+    $btnFreePlan.Text = "FREE"
+    $btnFreePlan.Size = New-Object System.Drawing.Size(100, 32)
+    $btnFreePlan.FlatStyle = "Flat"
+    $btnFreePlan.ForeColor = $script:Colors.TextPrimary
+    $btnFreePlan.BackColor = $script:Colors.Success
+    $btnFreePlan.Font = New-Object System.Drawing.Font($script:FontFamily, 9, [System.Drawing.FontStyle]::Bold)
+    $btnFreePlan.Add_Click({
+        $freeTweaks = @("Disabilita Telemetria", "Disabilita Bing nel Menu Start", "Disabilita Widgets",
+                        "Mostra Estensioni File", "Mostra File Nascosti")
+        foreach ($cb in $script:TweakCheckboxes) {
+            $cb.Checked = $freeTweaks -contains $cb.Text
+        }
+    })
+    $tweakBtnPanel.Controls.Add($btnFreePlan)
+
+    # BASIC Plan
+    $btnBasicPlan = New-Object System.Windows.Forms.Button
+    $btnBasicPlan.Text = "BASIC"
+    $btnBasicPlan.Size = New-Object System.Drawing.Size(100, 32)
+    $btnBasicPlan.FlatStyle = "Flat"
+    $btnBasicPlan.ForeColor = $script:Colors.BgDark
+    $btnBasicPlan.BackColor = $script:Colors.Warning
+    $btnBasicPlan.Font = New-Object System.Drawing.Font($script:FontFamily, 9, [System.Drawing.FontStyle]::Bold)
+    $btnBasicPlan.Add_Click({
+        $basicTweaks = @("Disabilita Telemetria", "Disabilita Cronologia Attività", "Disabilita Location Tracking",
+                         "Disabilita Bing nel Menu Start", "Disabilita Widgets", "Abilita End Task con Click Destro",
+                         "Abilita Game Mode", "Disabilita Animazioni UI", "Disabilita Advertising ID",
+                         "Disabilita App Background", "Mostra Estensioni File", "Mostra File Nascosti")
+        foreach ($cb in $script:TweakCheckboxes) {
+            $cb.Checked = $basicTweaks -contains $cb.Text
+        }
+    })
+    $tweakBtnPanel.Controls.Add($btnBasicPlan)
+
+    # PRO Plan
+    $btnProPlan = New-Object System.Windows.Forms.Button
+    $btnProPlan.Text = "PRO"
+    $btnProPlan.Size = New-Object System.Drawing.Size(100, 32)
+    $btnProPlan.FlatStyle = "Flat"
+    $btnProPlan.ForeColor = [System.Drawing.Color]::White
+    $btnProPlan.BackColor = $script:Colors.Accent
+    $btnProPlan.Font = New-Object System.Drawing.Font($script:FontFamily, 9, [System.Drawing.FontStyle]::Bold)
+    $btnProPlan.Add_Click({
+        foreach ($cb in $script:TweakCheckboxes) {
+            if ($cb.Text -notmatch "Disabilita Cortana|Ottimizza Servizi Non Necessari") {
+                $cb.Checked = $true
+            }
+        }
+    })
+    $tweakBtnPanel.Controls.Add($btnProPlan)
+
+    # GAMING Plan (FiveM/Fortnite)
+    $btnGamingPlan = New-Object System.Windows.Forms.Button
+    $btnGamingPlan.Text = "GAMING"
+    $btnGamingPlan.Size = New-Object System.Drawing.Size(110, 32)
+    $btnGamingPlan.FlatStyle = "Flat"
+    $btnGamingPlan.ForeColor = [System.Drawing.Color]::White
+    $btnGamingPlan.BackColor = [System.Drawing.Color]::FromArgb(138, 43, 226)
+    $btnGamingPlan.Font = New-Object System.Drawing.Font($script:FontFamily, 9, [System.Drawing.FontStyle]::Bold)
+    $btnGamingPlan.Add_Click({
+        Write-Log "Applicazione preset GAMING (FiveM/Fortnite)..." "INFO"
+
+        # Essential services must stay running
+        $protectedServices = @("PcaSvc", "DPS", "DiagTrack", "SysMain", "EventLog", "Registry", "AppInfo", "BFE", "bam", "DusmSvc")
+
+        # Apply gaming tweaks
+        $gamingTweaks = @("Disabilita Telemetria", "Disabilita Widgets", "Abilita Game Mode",
+                          "Piano Energetico: Prestazioni Max", "Disabilita Animazioni UI")
+        foreach ($cb in $script:TweakCheckboxes) {
+            $cb.Checked = $gamingTweaks -contains $cb.Text
+        }
+
+        Write-Log "Preset GAMING applicato - servizi essenziali protetti" "OK"
+    })
+    $tweakBtnPanel.Controls.Add($btnGamingPlan)
 
     $btnClearTweaks = New-Object System.Windows.Forms.Button
     $btnClearTweaks.Text = "Deseleziona"
