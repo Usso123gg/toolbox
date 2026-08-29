@@ -381,6 +381,36 @@ function Set-WallpaperFromFile {
     }
 }
 
+function Set-Wallpaper {
+    param([string]$Path, [string]$Style = "Fill")
+    $styleMap = @{ "Fill"=10; "Fit"=6; "Stretch"=2; "Tile"=0; "Center"=0; "Span"=22 }
+    $styleVal = $styleMap[$Style]
+    Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -Value $styleVal -Force
+    Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -Value 0 -Force
+
+    Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class Wallpaper {
+    [DllImport("user32.dll", CharSet=CharSet.Auto)]
+    public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+}
+"@
+    [Wallpaper]::SystemParametersInfo(0x0014, 0, $Path, 0x01 -bor 0x02) | Out-Null
+}
+
+function Set-WallpaperFromFile {
+    param([string]$Path)
+    if (Test-Path $Path) {
+        $dest = "$env:USERPROFILE\Pictures\SamWallpaper$([System.IO.Path]::GetExtension($Path))"
+        Copy-Item $Path $dest -Force
+        Set-Wallpaper -Path $dest -Style "Fill"
+        Write-Log "Sfondo impostato da: $Path" "OK"
+    } else {
+        Write-Log "File sfondo non trovato: $Path" "ERROR"
+    }
+}
+
 # ══════════════════════════════════════════════════════════════
 #  BUILD THE GUI
 # ══════════════════════════════════════════════════════════════
